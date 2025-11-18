@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Price of Glory - TCC Project</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+      box-sizing: border-box;
+    }
+
+    /* Paleta de cores: Verde escuro + Dourado */
+    :root {
+      --cor-fundo: #1a3d2e;         /* Verde escuro */
+      --cor-dourado: #e6c200;       /* Dourado principal */
+      --cor-dourado-claro: #f4d03f; /* Dourado claro */
+      --cor-telhado: #b34a30;
+      --cor-telhado-escuro: #8a2f1a;
+      --cor-verde: #2d6a4f;
+      --cor-escuro: #0f1f18;
+      --glass-border: rgba(255,255,255,0.1);
+    }
+
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      scroll-behavior: smooth; 
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color: #e0e0e0;
+      background: var(--cor-fundo);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1 0 auto;
+    }
+
+    /* Hero com texto dourado */
+    #inicio {
+      position: relative;
+      color: white;
+    }
+
+    #inicio h2 {
+      color: var(--cor-dourado) !important;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      font-weight: 800;
+    }
+
+    #inicio p {
+      color: var(--cor-dourado-claro) !important;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    #inicio .absolute.inset-0 {
+      background: rgba(0, 0, 0, 0.65) !important;
+    }
+
+    /* Cards brancos translúcidos */
+    .aventureiro-card,
+    .timeline-content {
+      background: rgba(255, 255, 255, 0.97) !important;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(0,0,0,0.15);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-top: 4px solid var(--cor-dourado);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .aventureiro-card:hover,
+    .timeline-content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+    }
+
+    .aventureiro-card img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      border: 4px solid var(--cor-verde);
+      transition: transform 0.3s;
+    }
+
+    .aventureiro-card:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Botões */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--cor-dourado);
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: var(--cor-dourado-claro);
+      transform: scale(1.03);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: var(--cor-verde);
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #1e4d3a;
+      transform: scale(1.03);
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 0;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--cor-dourado), var(--cor-verde), var(--cor-telhado));
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -2px;
+      border-radius: 4px;
+    }
+
+    .timeline-item {
+      padding: 10px 40px;
+      position: relative;
+      width: 50%;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .timeline-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--cor-dourado);
+      border: 4px solid white;
+      border-radius: 50%;
+      top: 20px;
+      z-index: 1;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
+
+    .left { left: 0; }
+    .right { left: 50%; }
+    .left::before { right: -10px; }
+    .right::before { left: -10px; }
+
+    .timeline-content {
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    /* Grid equipe */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Cor dos nomes da equipe alterada para o vermelho dos personagens */
+    .team-grid .aventureiro-card h3 {
+      color: var(--cor-telhado) !important;
+    }
+
+    /* Sub-timeline */
+    .sub-timeline {
+      list-style: none;
+      padding: 0;
+      position: relative;
+    }
+
+    .sub-timeline li {
+      margin-bottom: 2rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .sub-timeline li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.5rem;
+      width: 12px;
+      height: 12px;
+      background: var(--cor-dourado);
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .sub-timeline::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      background: var(--cor-dourado);
+      top: 0;
+      bottom: 0;
+      left: 5px;
+      opacity: 0.6;
+    }
+
+    /* Vídeo */
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      max-width: 100%;
+      background: #000;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      margin: 1rem auto;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0.75rem;
+    }
+
+    /* Footer */
+    footer {
+      background: #0f1f18;
+      color: var(--cor-dourado-claro);
+      padding: 2rem;
+      text-align: center;
+      flex-shrink: 0;
+      width: 100%;
+      border-top: 2px solid var(--cor-dourado);
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    /* Acessibilidade */
+    .acessibilidade-btn {
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px;
+      background: var(--cor-dourado); 
+      color: #1a1a1a;
+      border: none; 
+      border-radius: 50%; 
+      width: 56px; 
+      height: 56px; 
+      font-size: 26px;
+      cursor: pointer; 
+      z-index: 2000; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      font-weight: bold;
+    }
+
+    .painel-acessibilidade {
+      position: fixed; 
+      bottom: 90px; 
+      right: 20px; 
+      background: white;
+      border-radius: 12px; 
+      padding: 12px; 
+      display: none; 
+      flex-direction: column; 
+      gap: 10px;
+      z-index: 1999; 
+      width: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      border: 1px solid #ccc;
+    }
+
+    .painel-acessibilidade.active { 
+      display: flex; 
+    }
+
+    .painel-acessibilidade button {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #f0f0f0;
+      color: #000;
+      transition: all 0.2s;
+    }
+
+    .painel-acessibilidade button:hover {
+      background: var(--cor-dourado);
+      color: #1a1a1a;
+      transform: scale(1.03);
+    }
+
+    /* Navegação */
+    .nav-btn {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: var(--cor-verde);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 2001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .nav-btn:hover {
+      background: #1e4d3a;
+      transform: scale(1.03);
+    }
+
+    .nav-panel {
+      position: fixed;
+      bottom: 160px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 2000;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      border: 1px solid #ccc;
+    }
+
+    .nav-panel.active {
+      display: flex;
+    }
+
+    .nav-panel button {
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #f0f0f0;
+      color: #000;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .nav-panel button:hover {
+      background: var(--cor-dourado);
+      color: #1a1a1a;
+      transform: scale(1.03);
+    }
+
+    /* Wave verde escuro */
+    .wave-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%231a3d2e" fill-opacity="0.6" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-y center;
+      z-index: -1;
+      opacity: 0.7;
+    }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .timeline::after { left: 31px; }
+      .timeline-item { width: 100%; padding-left: 70px; padding-right: 25px; }
+      .timeline-item::before { left: 20px; }
+      .left, .right { left: 0; }
+      .team-grid { grid-template-columns: 1fr; }
+      .nav-btn { bottom: 150px; }
+      .nav-panel, .painel-acessibilidade { bottom: 220px; width: 260px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section id="inicio" class="h-screen flex items-center justify-center text-center px-6 relative">
+    <img src="imagens/hero-bg.png" alt="Price of Glory Background" class="w-full h-full object-cover absolute inset-0">
+    <div class="absolute inset-0"></div>
+    <div class="relative z-10 max-w-4xl mx-auto">
+      <h2 class="text-5xl md:text-6xl font-bold mb-4">Bem-vindo ao Price of Glory!</h2>
+      <p class="text-xl md:text-2xl mb-8">Um jogo desenvolvido para o TCC, unindo código, arte e aventura.</p>
+      <a href="#historia" class="btn btn-primary">Conheça a História</a>
+    </div>
+  </section>
+
+  <main>
+    <!-- Timeline -->
+    <div class="timeline relative" style="padding-top: 4rem;">
+      <div class="wave-bg"></div>
+
+      <!-- História -->
+      <div class="timeline-item left" id="historia">
+        <div class="timeline-content aventureiro-card">
+          <h2 class="text-3xl font-bold mb-6 text-[var(--cor-telhado)]">História do Jogo</h2>
+          <p class="text-lg text-gray-700 leading-relaxed mb-4">
+            A história se passa no reino de Jaaj, que é corrompido pela queda de seu poder após o Mago Maligno usar o artefato Coração de Tionizo. Durante esse evento catastrófico, o pai das protagonistas, Theron Solk, é dado como "morto", forçando as irmãs Ivy e Lira a fugirem.
+          </p>
+          <p class="text-lg text-gray-700 leading-relaxed">
+            Ivy Solk, uma jovem garota que carrega a culpa da morte de seu pai, Theron Solk, na queda de Jaaj, quando um mago maligno usou um artefato chamado “Coração de Tionizo” para possuir milhares de pessoas. Agora, Ivy Solk jura e busca vingança ao responsável pela terrível morte de Theron naquele dia.
+            Anos depois do trágico acidente, Ivy recebe um pergaminho misterioso de um pássaro diferente como nunca visto antes. Neste pergaminho, tinha algo que poderia mudar o rumo e a vida delas para sempre. Com medo e confusas, as meninas enfim abriram o misterioso papel, nele, escrito com letras estranhas, havia um comunicado, uma convocação para recuperar um coração perdido em uma ilha distante cujo nome é familiar: “Jaaj”.
+            Depois de algum tempo, ela aceitou e começou a sua misteriosa e longa jornada. No caminho até a ilha, um velho sábio abordou-a com um comunicado de uma profecia, ele dizia-”Filhos do fogo e da esperança, ouvi: o Coração de Tiozino promete poder, mas aprisiona as almas. Para quebrar sua maldição, dois corações devem se unir, renunciando à glória da espada por um laço eterno. A verdadeira vitória floresce na paz de uma vida simples, onde o amor supera o orgulho.”
+            Ciente do que aquele homem disse à ela, continuou a jornada, enfrentando monstros bizarros, correndo e saltando com parkours, até chegar no misterioso inimigo, ele possuía o coração perdido que elas queriam. Com perseguição e luta contra o esse inimigo, ela acaba descobrindo a verdadeira identidade do vilão, decidida, elas destroem o coração, perdendo seus poderes, aceitando uma vida simples e feliz, honrando o sacrifício pelo bem maior.
+          </p>
+        </div>
+      </div>
+
+      <!-- Personagens -->
+      <div class="timeline-item right" id="personagem-ivy">
+        <div class="timeline-content aventureiro-card text-center">
+          <img src="imagens/eve.gif" alt="Ivy Solk">
+          <h3 class="text-2xl font-bold text-[var(--cor-telhado)] mb-3">Ivy Solk</h3>
+          <p class="text-gray-700 text-lg">Ivy cresceu no reino de Jaaj com seu pai, Theron Solk. Após a morte de seu pai em um duelo contra o portador do Coração de Tionizo, Ivy deixa seu reino para esquecer de seus traumas. Depois de anos, chega até ela um pássaro com um pergaminho, avisando sobre problemas em Jaaj; ela parte em busca de respostas.</p>
+          <a href="perfil-ivysolk.html" class="btn btn-secondary mt-4 inline-block">Saiba mais</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left" id="personagem-theron">
+        <div class="timeline-content aventureiro-card text-center">
+          <img src="imagens/theronsolk.jpg" alt="Theron Solk">
+          <h3 class="text-2xl font-bold text-[var(--cor-telhado)] mb-3">Theron Solk</h3>
+          <p class="text-gray-700 text-lg">Theron foi um dos fundadores do reino de Jaaj, sendo um pilar para os cidadãos do local. Pai de Ivy, sacrificou-se para protegê-la e ao reino do artefato Coração de Tionizo.</p>
+          <a href="perfil-bruno.html" class="btn btn-secondary mt-4 inline-block">Saiba mais</a>
+        </div>
+      </div>
+
+      <div class="timeline-item right" id="personagem-espectro">
+        <div class="timeline-content aventureiro-card text-center">
+          <img src="imagens/espectro.gif" alt="Espectro Púrpura">
+          <h3 class="text-2xl font-bold text-[var(--cor-telhado)] mb-3">Espectro Púrpura</h3>
+          <p class="text-gray-700 text-lg">Em um reino próspero, surgiu uma nova ameaça que corrompeu o coração da população e os transformou em cascas do que eram antes. O Espectro comanda as sombras e persegue o Coração de Tionizo.</p>
+          <a href="perfil-lucas.html" class="btn btn-secondary mt-4 inline-block">Saiba mais</a>
+        </div>
+      </div>
+
+      <div class="timeline-item left" id="personagem-cavaleiro">
+        <div class="timeline-content aventureiro-card text-center">
+          <img src="imagens/dark.gif" alt="Cavaleiro Misterioso">
+          <h3 class="text-2xl font-bold text-[var(--cor-telhado)] mb-3">???? - Cavaleiro Misterioso</h3>
+          <p class="text-gray-700 text-lg">Surgindo em tempos de paz, o cavaleiro misterioso consome o reino com sua maldade e mina todas as esperanças da população; suas motivações e objetos são desconhecidos.</p>
+          <a href="perfil-giullia.html" class="btn btn-secondary mt-4 inline-block">Saiba mais</a>
+        </div>
+      </div>
+
+      <div class="timeline-item right" id="personagem-mago">
+        <div class="timeline-content aventureiro-card text-center">
+          <img src="imagens/mago.gif" alt="Mago da Profecia">
+          <h3 class="text-2xl font-bold text-[var(--cor-telhado)] mb-3">Mago da Profecia</h3>
+          <p class="text-gray-700 text-lg">O mago cresceu nas montanhas com sapos sábios, aprendendo antigas técnicas. Ele prevê o destino do reino e orienta Ivy com enigmas sobre o Coração perdido.</p>
+          <a href="perfil-guilherme.html" class="btn btn-secondary mt-4 inline-block">Saiba mais</a>
+        </div>
+      </div>
+
+      <!-- Objetivo -->
+      <div class="timeline-item left" id="objetivo">
+        <div class="timeline-content aventureiro-card">
+          <h2 class="text-3xl font-bold mb-6 text-[var(--cor-telhado)]">Objetivo do Jogo</h2>
+          <p class="text-lg text-gray-700 leading-relaxed mb-4">
+            O principal objetivo de <strong>Price of Glory</strong> é guiar Ivy Solk em sua jornada para recuperar o lendário
+            <em>Coração de Tionizo</em> e libertar o reino de Jaaj da maldição que o assombra há anos.
+          </p>
+          <p class="text-lg text-gray-700 leading-relaxed">
+            O jogador deverá superar obstáculos, enfrentar criaturas corrompidas e resolver desafios que testam tanto
+            suas habilidades quanto sua sabedoria. A história conduz o jogador a refletir sobre sacrifício, coragem e o
+            verdadeiro significado de glória.
+          </p>
+        </div>
+      </div>
+
+      <!-- Equipe -->
+      <div class="timeline-item right" id="equipe">
+        <div class="timeline-content aventureiro-card">
+          <h2 class="text-3xl font-bold mb-6 text-[var(--cor-telhado)]">Nossa Equipe</h2>
+          <div class="team-grid">
+            <a href="gabi.html" class="aventureiro-card text-center p-4">
+              <img src="imagens/gabriel.jpg" alt="Gabriel Aparecido">
+              <h3 class="text-xl font-semibold mb-1">Gabriel Aparecido</h3>
+              <p class="text-gray-700 text-sm">Coordenador da Equipe</p>
+            </a>
+            <a href="bru.html" class="aventureiro-card text-center p-4">
+              <img src="imagens/bruno.jpg" alt="Bruno">
+              <h3 class="text-xl font-semibold mb-1">Bruno</h3>
+              <p class="text-gray-700 text-sm">Site e Pixel Arts</p>
+            </a>
+            <a href="lucas.html" class="aventureiro-card text-center p-4">
+              <img src="imagens/lucas.jpg" alt="Lucas Souza">
+              <h3 class="text-xl font-semibold mb-1">Lucas Souza</h3>
+              <p class="text-gray-700 text-sm">Programação do Jogo</p>
+            </a>
+            <a href="jalo.html" class="aventureiro-card text-center p-4">
+              <img src="imagens/jalovicar.jpg" alt="Giullia">
+              <h3 class="text-xl font-semibold mb-1">Giullia</h3>
+              <p class="text-gray-700 text-sm">Documentação</p>
+            </a>
+            <a href="p1.html" class="aventureiro-card text-center p-4">
+              <img src="imagens/p1.jpg" alt="Guilherme Pescuma">
+              <h3 class="text-xl font-semibold mb-1">Guilherme Pescuma</h3>
+              <p class="text-gray-700 text-sm">Pixel Arts</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desenvolvimento -->
+      <div class="timeline-item left" id="desenvolvimento">
+        <div class="timeline-content aventureiro-card">
+          <h2 class="text-3xl font-bold mb-6 text-[var(--cor-telhado)]">Trajetória de Desenvolvimento</h2>
+          <ul class="sub-timeline">
+            <li><h3 class="text-xl font-semibold text-[var(--cor-verde)] mb-2">Planejamento Inicial (Setembro 2025)</h3><p class="text-gray-700">Brainstorm de ideias, definição de escopo e criação do conceito do jogo.</p></li>
+            <li><h3 class="text-xl font-semibold text-[var(--cor-verde)] mb-2">Início da Documentação (Outubro 2025)</h3><p class="text-gray-700">Elaboração de documentos de design, requisitos e storyboards.</p></li>
+            <li><h3 class="text-xl font-semibold text-[var(--cor-verde)] mb-2">Início da Programação (Outubro 2025)</h3><p class="text-gray-700">Configuração do ambiente e implementação das primeiras mecânicas.</p></li>
+            <li><h3 class="text-xl font-semibold text-[var(--cor-verde)] mb-2">Atualizações Atuais</h3><p class="text-gray-700">Adição de features, testes e refinamentos.</p></li>
+            <li><h3 class="text-xl font-semibold text-[var(--cor-verde)] mb-2">Próximos Passos</h3><p class="text-gray-700">Finalização de assets, integração e lançamento beta.</p></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Vídeo -->
+      <div class="timeline-item right" id="andamento">
+        <div class="timeline-content aventureiro-card">
+          <h2 class="text-3xl font-bold mb-6 text-[var(--cor-telhado)]">Demonstração do Andamento</h2>
+          <p class="text-lg text-gray-700 mb-6">Assista ao vídeo que mostra o progresso atual do nosso jogo Price of Glory.</p>
+          <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/2X-4tJKhWsQ" title="Demonstração Price of Glory" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p class="text-lg font-bold">&copy; 2025 Aventureiros x Horda. Todos os direitos reservados.</p>
+    <p class="mt-2 text-sm opacity-90">Desenvolvido com paixão pela equipe <strong>Price of Glory</strong>.</p>
+  </footer>
+
+  <!-- Acessibilidade -->
+  <button id="acessibilidadeBtn" class="acessibilidade-btn" aria-label="Acessibilidade">♿</button>
+  <div id="painelAcessibilidade" class="painel-acessibilidade" role="menu">
+    <button id="aumentarFonte">Aumentar Fonte</button>
+    <button id="diminuirFonte">Diminuir Fonte</button>
+    <button id="altoContraste">Alto Contraste</button>
+    <button id="resetarAcessibilidade">Resetar</button>
+  </div>
+
+  <!-- Navegação -->
+  <button id="navBtn" class="nav-btn" aria-label="Navegação">☰</button>
+  <div id="navPanel" class="nav-panel" role="menu">
+    <button data-section="inicio">Início</button>
+    <button data-section="historia">História do Jogo</button>
+    <button data-section="personagem-ivy">Ivy Solk</button>
+    <button data-section="personagem-theron">Theron Solk</button>
+    <button data-section="personagem-espectro">Espectro Púrpura</button>
+    <button data-section="personagem-cavaleiro">Cavaleiro Misterioso</button>
+    <button data-section="personagem-mago">Mago da Profecia</button>
+    <button data-section="objetivo">Objetivo do Jogo</button>
+    <button data-section="equipe">Nossa Equipe</button>
+    <button data-section="desenvolvimento">Trajetória de Desenvolvimento</button>
+    <button data-section="andamento">Demonstração do Andamento</button>
+  </div>
+
+  <script>
+    // Acessibilidade
+    const btnAcess = document.getElementById("acessibilidadeBtn");
+    const painelAcess = document.getElementById("painelAcessibilidade");
+    btnAcess.addEventListener("click", (e) => {
+      e.stopPropagation();
+      painelAcess.classList.toggle("active");
+      if (painelAcess.classList.contains("active")) painelAcess.querySelector('button').focus();
+    });
+    document.addEventListener("click", (e) => {
+      if (!painelAcess.contains(e.target) && e.target !== btnAcess) painelAcess.classList.remove("active");
+    });
+
+    let fontSize = 16;
+    document.getElementById("aumentarFonte").onclick = () => {
+      fontSize = Math.min(fontSize + 2, 26);
+      document.body.style.fontSize = fontSize + "px";
+      painelAcess.style.fontSize = fontSize + "px";
+      document.getElementById("navPanel").style.fontSize = fontSize + "px";
+    };
+    document.getElementById("diminuirFonte").onclick = () => {
+      fontSize = Math.max(12, fontSize - 2);
+      document.body.style.fontSize = fontSize + "px";
+      painelAcess.style.fontSize = fontSize + "px";
+      document.getElementById("navPanel").style.fontSize = fontSize + "px";
+    };
+    document.getElementById("altoContraste").onclick = () => {
+      document.body.style.background = "#000";
+      document.body.style.color = "#FFD700";
+      document.querySelectorAll(".aventureiro-card, .timeline-content").forEach(el => {
+        el.style.background = "#111";
+        el.style.color = "#FFD700";
+        el.style.borderColor = "#FFD700";
+      });
+    };
+    document.getElementById("resetarAcessibilidade").onclick = () => {
+      fontSize = 16;
+      document.body.style.fontSize = "16px";
+      document.body.style.background = "";
+      document.body.style.color = "";
+      document.querySelectorAll(".aventureiro-card, .timeline-content").forEach(el => {
+        el.style.background = "";
+        el.style.color = "";
+        el.style.borderColor = "";
+      });
+    };
+
+    // Navegação
+    const navBtn = document.getElementById("navBtn");
+    const navPanel = document.getElementById("navPanel");
+    navBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      navPanel.classList.toggle("active");
+      if (navPanel.classList.contains("active")) navPanel.querySelector('button').focus();
+    });
+    document.addEventListener("click", (e) => {
+      if (!navPanel.contains(e.target) && e.target !== navBtn) navPanel.classList.remove("active");
+    });
+
+    navPanel.querySelectorAll('button').forEach(button => {
+      button.addEventListener("click", () => {
+        const sectionId = button.getAttribute("data-section");
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+        navPanel.classList.remove("active");
+      });
+    });
+
+    // Animação da timeline
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.timeline-item').forEach(item => observer.observe(item));
+  </script>
+</body>
+</html>
